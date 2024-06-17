@@ -3,134 +3,115 @@ from pyfair import FairModel
 import warnings
 import streamlit as st
 from decimal import Decimal
+import pandas as pd
+from io import BytesIO
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-def risk_threat_1(
-    simulations: int,
-    use_tef: bool,
-    use_vuln: bool,
-    two_model: bool,
-    meta_model: bool,
-    **kwargs
-):
-    # Model 1
-    model1 = FairModel(name="Risk Type 1", n_simulations=simulations)
-    model1.input_data(
-        "Loss Magnitude",
-        low=kwargs.get("lm_low_1"),
-        mode=kwargs.get("lm_mode_1"),
-        high=kwargs.get("lm_high_1"),
-    )
-    if use_tef:
-        model1.input_data(
-            "Threat Event Frequency",
-            low=kwargs.get("tef_low_1"),
-            mode=kwargs.get("tef_mode_1"),
-            high=kwargs.get("tef_high_1"),
-        )
-    else:
-        model1.input_data(
-            "Contact Frequency",
-            low=kwargs.get("contact_low_1"),
-            mode=kwargs.get("contact_mode_1"),
-            high=kwargs.get("contact_high_1"),
-        )
-        model1.input_data(
-            "Probability of Action",
-            low=kwargs.get("action_low_1"),
-            mode=kwargs.get("action_mode_1"),
-            high=kwargs.get("action_high_1"),
-        )
-    if use_vuln:
-        model1.input_data(
-            "Vulnerability",
-            low=kwargs.get("vuln_low_1"),
-            mode=kwargs.get("vuln_mode_1"),
-            high=kwargs.get("vuln_high_1"),
-        )
-    else:
-        model1.input_data(
-            "Threat Capability",
-            low=kwargs.get("threat_low_1"),
-            mode=kwargs.get("threat_mode_1"),
-            high=kwargs.get("threat_high_1"),
-        )
-        model1.input_data(
-            "Control Strength",
-            low=kwargs.get("control_low_1"),
-            mode=kwargs.get("control_mode_1"),
-            high=kwargs.get("control_high_1"),
-        )
-    model1.calculate_all()
+def calculate_risk(simulations, use_tef, use_vuln, two_model, meta_model, **kwargs):
+    """
+    Calculates risk using PyFair models based on user input.
 
-    # Model 2 (Identical to Model 1 for this example)
-    model2 = None
-    if two_model:
-        model2 = FairModel(name="Risk Type 2", n_simulations=simulations)
-        model2.input_data(
-            "Loss Magnitude",
-            low=kwargs.get("lm_low_2"),
-            mode=kwargs.get("lm_mode_2"),
-            high=kwargs.get("lm_high_2"),
+    Returns:
+        - fsr (FairSimpleReport): PyFair report object
+        - model1 (FairModel): First risk model
+        - model2 (FairModel): Optional second risk model
+        - mm (FairMetaModel): Optional meta model
+    """
+    # --- Model Creation and Input Handling ---
+    model1 = create_fair_model(
+        name="Risk Type 1",
+        use_tef=use_tef,
+        use_vuln=use_vuln,
+        simulations=simulations,
+        **kwargs,
+    )
+    model2 = (
+        create_fair_model(
+            name="Risk Type 2",
+            use_tef=use_tef,
+            use_vuln=use_vuln,
+            simulations=simulations,
+            **kwargs,
         )
-        if use_tef:
-            model2.input_data(
-                "Threat Event Frequency",
-                low=kwargs.get("tef_low_2"),
-                mode=kwargs.get("tef_mode_2"),
-                high=kwargs.get("tef_high_2"),
-            )
-        else:
-            model2.input_data(
-                "Contact Frequency",
-                low=kwargs.get("contact_low_2"),
-                mode=kwargs.get("contact_mode_2"),
-                high=kwargs.get("contact_high_2"),
-            )
-            model2.input_data(
-                "Probability of Action",
-                low=kwargs.get("action_low_2"),
-                mode=kwargs.get("action_mode_2"),
-                high=kwargs.get("action_high_2"),
-            )
-        if use_vuln:
-            model2.input_data(
-                "Vulnerability",
-                low=kwargs.get("vuln_low_2"),
-                mode=kwargs.get("vuln_mode_2"),
-                high=kwargs.get("vuln_high_2"),
-            )
-        else:
-            model2.input_data(
-                "Threat Capability",
-                low=kwargs.get("threat_low_2"),
-                mode=kwargs.get("threat_mode_2"),
-                high=kwargs.get("threat_high_2"),
-            )
-            model2.input_data(
-                "Control Strength",
-                low=kwargs.get("control_low_2"),
-                mode=kwargs.get("control_mode_2"),
-                high=kwargs.get("control_high_2"),
-            )
-        model2.calculate_all()
+        if two_model
+        else None
+    )
 
     models = [model1]
     if two_model:
         models.append(model2)
 
-    # Metamodel
-    mm = None
-    if meta_model:
-        mm = pyfair.FairMetaModel(name="Meta Model", models=models)
+    # --- Metamodel ---
+    mm = pyfair.FairMetaModel(name="Meta Model", models=models) if meta_model else None
+    if mm:
         mm.calculate_all()
         models.append(mm)
 
-    # Create and Customize Report
+    # --- Reporting ---
     fsr = pyfair.FairSimpleReport(models, currency_prefix="GBP ")
     return fsr, model1, model2, mm
+
+
+def create_fair_model(name, use_tef, use_vuln, simulations, **kwargs):
+    """Creates a FairModel with input data based on provided parameters."""
+    model = FairModel(name=name, n_simulations=simulations)
+
+    # Input the loss magnitude parameters
+    model.input_data(
+        "Loss Magnitude",
+        low=kwargs.get(f"lm_low_{name[-1]}"),
+        mode=kwargs.get(f"lm_mode_{name[-1]}"),
+        high=kwargs.get(f"lm_high_{name[-1]}"),
+    )
+
+    # Input the frequency-related parameters based on whether TEF is used
+    if use_tef:
+        model.input_data(
+            "Threat Event Frequency",
+            low=kwargs.get(f"tef_low_{name[-1]}"),
+            mode=kwargs.get(f"tef_mode_{name[-1]}"),
+            high=kwargs.get(f"tef_high_{name[-1]}"),
+        )
+    else:
+        model.input_data(
+            "Contact Frequency",
+            low=kwargs.get(f"contact_low_{name[-1]}"),
+            mode=kwargs.get(f"contact_mode_{name[-1]}"),
+            high=kwargs.get(f"contact_high_{name[-1]}"),
+        )
+        model.input_data(
+            "Probability of Action",
+            low=kwargs.get(f"action_low_{name[-1]}"),
+            mode=kwargs.get(f"action_mode_{name[-1]}"),
+            high=kwargs.get(f"action_high_{name[-1]}"),
+        )
+
+    # Input the vulnerability/threat-related parameters based on whether vulnerability is used
+    if use_vuln:
+        model.input_data(
+            "Vulnerability",
+            low=kwargs.get(f"vuln_low_{name[-1]}"),
+            mode=kwargs.get(f"vuln_mode_{name[-1]}"),
+            high=kwargs.get(f"vuln_high_{name[-1]}"),
+        )
+    else:
+        model.input_data(
+            "Threat Capability",
+            low=kwargs.get(f"threat_low_{name[-1]}"),
+            mode=kwargs.get(f"threat_mode_{name[-1]}"),
+            high=kwargs.get(f"threat_high_{name[-1]}"),
+        )
+        model.input_data(
+            "Control Strength",
+            low=kwargs.get(f"control_low_{name[-1]}"),
+            mode=kwargs.get(f"control_mode_{name[-1]}"),
+            high=kwargs.get(f"control_high_{name[-1]}"),
+        )
+
+    model.calculate_all()
+    return model
 
 
 if __name__ == "__main__":
@@ -186,6 +167,7 @@ if __name__ == "__main__":
             * Decimal(1000000.00)
         )
         results_args["lm_low_1"] = lm_low_1
+
         if use_tef:
             tef_low_1 = st.number_input(
                 label="TEF LOW 1",
@@ -196,6 +178,7 @@ if __name__ == "__main__":
                 value=0,
             )
             results_args["tef_low_1"] = tef_low_1
+
         else:
             contact_low_1 = st.number_input(
                 label="Contact LOW 1",
@@ -215,6 +198,7 @@ if __name__ == "__main__":
             )
             results_args["contact_low_1"] = contact_low_1
             results_args["action_low_1"] = action_low_1
+
         if use_vuln:
             vuln_low_1 = st.number_input(
                 label="VULN LOW 1",
@@ -225,6 +209,7 @@ if __name__ == "__main__":
                 value=0.01,
             )
             results_args["vuln_low_1"] = vuln_low_1
+
         else:
             threat_low_1 = st.number_input(
                 label="threat LOW 1",
@@ -244,6 +229,7 @@ if __name__ == "__main__":
             )
             results_args["threat_low_1"] = threat_low_1
             results_args["control_low_1"] = control_low_1
+
     with col3:
         st.write("Mode")
         lm_mode_1 = float(
@@ -260,6 +246,7 @@ if __name__ == "__main__":
             * Decimal(1000000.00)
         )
         results_args["lm_mode_1"] = lm_mode_1
+
         if use_tef:
             tef_mode_1 = st.number_input(
                 label="TEF MODE 1",
@@ -270,6 +257,7 @@ if __name__ == "__main__":
                 value=2,
             )
             results_args["tef_mode_1"] = tef_mode_1
+
         else:
             contact_mode_1 = st.number_input(
                 label="Contact mode 1",
@@ -289,6 +277,7 @@ if __name__ == "__main__":
             )
             results_args["contact_mode_1"] = contact_mode_1
             results_args["action_mode_1"] = action_mode_1
+
         if use_vuln:
             vuln_mode_1 = st.number_input(
                 label="VULN MODE 1",
@@ -299,6 +288,7 @@ if __name__ == "__main__":
                 value=0.3,
             )
             results_args["vuln_mode_1"] = vuln_mode_1
+
         else:
             threat_mode_1 = st.number_input(
                 label="threat mode 1",
@@ -318,6 +308,7 @@ if __name__ == "__main__":
             )
             results_args["threat_mode_1"] = threat_mode_1
             results_args["control_mode_1"] = control_mode_1
+
     with col4:
         st.write("High")
         lm_high_1 = float(
@@ -334,6 +325,7 @@ if __name__ == "__main__":
             * Decimal(1000000.00)
         )
         results_args["lm_high_1"] = lm_high_1
+
         if use_tef:
             tef_high_1 = st.number_input(
                 label="TEF HIGH 1",
@@ -344,6 +336,7 @@ if __name__ == "__main__":
                 value=12,
             )
             results_args["tef_high_1"] = tef_high_1
+
         else:
             contact_high_1 = st.number_input(
                 label="Contact high 1",
@@ -363,6 +356,7 @@ if __name__ == "__main__":
             )
             results_args["contact_high_1"] = contact_high_1
             results_args["action_high_1"] = action_high_1
+
         if use_vuln:
             vuln_high_1 = st.number_input(
                 label="VULN HIGH 1",
@@ -373,6 +367,7 @@ if __name__ == "__main__":
                 value=0.5,
             )
             results_args["vuln_high_1"] = vuln_high_1
+
         else:
             threat_high_1 = st.number_input(
                 label="threat high 1",
@@ -393,6 +388,7 @@ if __name__ == "__main__":
             results_args["threat_high_1"] = threat_high_1
             results_args["control_high_1"] = control_high_1
 
+    # Model 2
     if two_model:
         col1, col2, col3, col4 = st.columns(spec=4)
         with col1:
@@ -427,6 +423,7 @@ if __name__ == "__main__":
                 * Decimal(1000000.00)
             )
             results_args["lm_low_2"] = lm_low_2
+
             if use_tef:
                 tef_low_2 = st.number_input(
                     label="TEF LOW 2",
@@ -437,6 +434,7 @@ if __name__ == "__main__":
                     value=0,
                 )
                 results_args["tef_low_2"] = tef_low_2
+
             else:
                 contact_low_2 = st.number_input(
                     label="Contact low 2",
@@ -456,6 +454,7 @@ if __name__ == "__main__":
                 )
                 results_args["contact_low_2"] = contact_low_2
                 results_args["action_low_2"] = action_low_2
+
             if use_vuln:
                 vuln_low_2 = st.number_input(
                     label="VULN LOW 2",
@@ -466,6 +465,7 @@ if __name__ == "__main__":
                     value=0.01,
                 )
                 results_args["vuln_low_2"] = vuln_low_2
+
             else:
                 threat_low_2 = st.number_input(
                     label="threat LOW 2",
@@ -485,6 +485,7 @@ if __name__ == "__main__":
                 )
                 results_args["threat_low_2"] = threat_low_2
                 results_args["control_low_2"] = control_low_2
+
         with col3:
             st.write("Mode")
             lm_mode_2 = float(
@@ -501,6 +502,7 @@ if __name__ == "__main__":
                 * Decimal(1000000.00)
             )
             results_args["lm_mode_2"] = lm_mode_2
+
             if use_tef:
                 tef_mode_2 = st.number_input(
                     label="TEF MODE 2",
@@ -511,6 +513,7 @@ if __name__ == "__main__":
                     value=2,
                 )
                 results_args["tef_mode_2"] = tef_mode_2
+
             else:
                 contact_mode_2 = st.number_input(
                     label="Contact mode 2",
@@ -530,6 +533,7 @@ if __name__ == "__main__":
                 )
                 results_args["contact_mode_2"] = contact_mode_2
                 results_args["action_mode_2"] = action_mode_2
+
             if use_vuln:
                 vuln_mode_2 = st.number_input(
                     label="VULN MODE 2",
@@ -540,6 +544,7 @@ if __name__ == "__main__":
                     value=0.3,
                 )
                 results_args["vuln_mode_2"] = vuln_mode_2
+
             else:
                 threat_mode_2 = st.number_input(
                     label="threat mode 2",
@@ -559,6 +564,7 @@ if __name__ == "__main__":
                 )
                 results_args["threat_mode_2"] = threat_mode_2
                 results_args["control_mode_2"] = control_mode_2
+
         with col4:
             st.write("High")
             lm_high_2 = float(
@@ -575,6 +581,7 @@ if __name__ == "__main__":
                 * Decimal(1000000.00)
             )
             results_args["lm_high_2"] = lm_high_2
+
             if use_tef:
                 tef_high_2 = st.number_input(
                     label="TEF HIGH 2",
@@ -585,6 +592,7 @@ if __name__ == "__main__":
                     value=12,
                 )
                 results_args["tef_high_2"] = tef_high_2
+
             else:
                 contact_high_2 = st.number_input(
                     label="Contact high 2",
@@ -604,6 +612,7 @@ if __name__ == "__main__":
                 )
                 results_args["contact_high_2"] = contact_high_2
                 results_args["action_high_2"] = action_high_2
+
             if use_vuln:
                 vuln_high_2 = st.number_input(
                     label="VULN HIGH 2",
@@ -614,6 +623,7 @@ if __name__ == "__main__":
                     value=0.5,
                 )
                 results_args["vuln_high_2"] = vuln_high_2
+
             else:
                 threat_high_2 = st.number_input(
                     label="threat high 2",
@@ -637,13 +647,13 @@ if __name__ == "__main__":
     submitted = st.button("Calculate")
 
     if submitted:
-        fsr, model1, model2, mm = risk_threat_1(
+        fsr, model1, model2, mm = calculate_risk(
             simulations=simulations,
             use_tef=use_tef,
             use_vuln=use_vuln,
             two_model=two_model,
             meta_model=meta_model,
-            **results_args
+            **results_args,
         )
         if fsr:
             st.success("Model Generated")
@@ -655,14 +665,22 @@ if __name__ == "__main__":
                     file_name="output.html",
                     mime="text/html",
                 )
-            df = model1.export_results()
-            binary_csv_file = df.to_csv("output.csv")
-            with open("output.csv", "rb") as file:
-                csv_btn = st.download_button(
-                    label="Download Simulation as CSV",
-                    data=file,
-                    file_name="output.csv",
-                    mime="text/csv",
-                )
+            df_model1 = model1.export_results()
+            df_model2 = model2.export_results()
+            df_mm = mm.export_results()
+
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                df_model1.to_excel(writer, sheet_name="Model 1", index=False)
+                df_model2.to_excel(writer, sheet_name="Model 2", index=False)
+                df_mm.to_excel(writer, sheet_name="Meta Model", index=False)
+            output.seek(0)
+            xlsx_btn = st.download_button(
+                label="Download Simulation as XLSX",
+                data=output,
+                file_name="output.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+
         else:
             st.error("Error generating Model")
