@@ -140,7 +140,6 @@ if __name__ == "__main__":
         st.write("Loss Magnitude (£ million)")
         if use_tef:
             st.write("TEF (per year)")
-            st.write("")
         else:
             st.write("Contact Frequency (per year)")
             st.write("Probability of Action (%)")
@@ -148,9 +147,7 @@ if __name__ == "__main__":
             st.write("Vulnerability (% per year)")
         else:
             st.write("Threat Capacity (%)")
-            st.write("")
             st.write("Control (Resistance) Strength (%)")
-            st.write("")
     with col2:
         st.write("Low")
         lm_low_1 = float(
@@ -396,7 +393,6 @@ if __name__ == "__main__":
             st.write("Loss Magnitude (£ million)")
             if use_tef:
                 st.write("TEF (per year)")
-                st.write("")
             else:
                 st.write("Contact Frequency (per year)")
                 st.write("Probability of Action (%)")
@@ -404,9 +400,7 @@ if __name__ == "__main__":
                 st.write("Vulnerability (% per year)")
             else:
                 st.write("Threat Capacity (%)")
-                st.write("")
                 st.write("Control (Resistance) Strength (%)")
-                st.write("")
         with col2:
             st.write("Low")
             lm_low_2 = float(
@@ -666,14 +660,18 @@ if __name__ == "__main__":
                     mime="text/html",
                 )
             df_model1 = model1.export_results()
-            df_model2 = model2.export_results()
-            df_mm = mm.export_results()
+            if two_model:
+                df_model2 = model2.export_results()
+            if meta_model:
+                df_mm = mm.export_results()
 
             output = BytesIO()
             with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
                 df_model1.to_excel(writer, sheet_name="Model 1", index=False)
-                df_model2.to_excel(writer, sheet_name="Model 2", index=False)
-                df_mm.to_excel(writer, sheet_name="Meta Model", index=False)
+                if two_model:
+                    df_model2.to_excel(writer, sheet_name="Model 2", index=False)
+                if meta_model:
+                    df_mm.to_excel(writer, sheet_name="Meta Model", index=False)
             output.seek(0)
             xlsx_btn = st.download_button(
                 label="Download Simulation as XLSX",
