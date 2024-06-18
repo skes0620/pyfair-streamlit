@@ -73,7 +73,6 @@ def create_fair_model(name, use_tef, use_vuln, simulations, **kwargs):
             low=kwargs.get(f"tef_low_{name[-1]}"),
             mode=kwargs.get(f"tef_mode_{name[-1]}"),
             high=kwargs.get(f"tef_high_{name[-1]}"),
-            gamma=kwargs.get(f"tef_gamma_{name[-1]}")
         )
     else:
         model.input_data(
@@ -81,14 +80,12 @@ def create_fair_model(name, use_tef, use_vuln, simulations, **kwargs):
             low=kwargs.get(f"contact_low_{name[-1]}"),
             mode=kwargs.get(f"contact_mode_{name[-1]}"),
             high=kwargs.get(f"contact_high_{name[-1]}"),
-            gamma=kwargs.get(f"contact_gamma_{name[-1]}")
         )
         model.input_data(
             "Probability of Action",
             low=kwargs.get(f"action_low_{name[-1]}"),
             mode=kwargs.get(f"action_mode_{name[-1]}"),
             high=kwargs.get(f"action_high_{name[-1]}"),
-            gamma=kwargs.get(f"action_gamma_{name[-1]}")
         )
 
     # Input the vulnerability/threat-related parameters based on whether vulnerability is used
@@ -98,7 +95,6 @@ def create_fair_model(name, use_tef, use_vuln, simulations, **kwargs):
             low=kwargs.get(f"vuln_low_{name[-1]}"),
             mode=kwargs.get(f"vuln_mode_{name[-1]}"),
             high=kwargs.get(f"vuln_high_{name[-1]}"),
-            gamma=kwargs.get(f"vuln_gamma_{name[-1]}")
         )
     else:
         model.input_data(
@@ -106,14 +102,12 @@ def create_fair_model(name, use_tef, use_vuln, simulations, **kwargs):
             low=kwargs.get(f"threat_low_{name[-1]}"),
             mode=kwargs.get(f"threat_mode_{name[-1]}"),
             high=kwargs.get(f"threat_high_{name[-1]}"),
-            gamma=kwargs.get(f"action_gamma_{name[-1]}")
         )
         model.input_data(
             "Control Strength",
             low=kwargs.get(f"control_low_{name[-1]}"),
             mode=kwargs.get(f"control_mode_{name[-1]}"),
             high=kwargs.get(f"control_high_{name[-1]}"),
-            gamma=kwargs.get(f"control_gamma_{name[-1]}")
         )
 
     model.calculate_all()
@@ -143,7 +137,7 @@ if __name__ == "__main__":
         "Number of Simulations", min_value=10000, max_value=100000, step=10000
     )
     results_args = {}
-    col1, col2, col3, col4, col5 = st.columns(spec=[1.5, 1, 1, 1, 1])
+    col1, col2, col3, col4 = st.columns(spec=4)
     with col1:
         st.write("Model 1")
         st.write("Loss Magnitude (£ million)")
@@ -400,97 +394,10 @@ if __name__ == "__main__":
             )
             results_args["threat_high_1"] = threat_high_1
             results_args["control_high_1"] = control_high_1
-    with col5:
-        st.write("Confidence")
-        lm_gamma_1 = float(
-            st.number_input(
-                label="LM Gamma",
-                label_visibility="collapsed",
-                step=0.1,
-                min_value=0.0,
-                max_value=100.0,
-                value=4.0,
-            )
-        )
-        results_args["lm_gamma_1"] = lm_gamma_1
-
-        if use_tef:
-            tef_gamma_1 = float(
-                st.number_input(
-                    label="TEF Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            results_args["tef_gamma_1"] = tef_gamma_1
-
-        else:
-            contact_gamma_1 = float(
-                st.number_input(
-                    label="Contact Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            action_gamma_1 = float(
-                st.number_input(
-                    label="Action Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            results_args["contact_gamma_1"] = contact_gamma_1
-            results_args["action_gamma_1"] = action_gamma_1
-
-        if use_vuln:
-            vuln_gamma_1 = float(
-                st.number_input(
-                    label="Vuln Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            results_args["vuln_gamma_1"] = vuln_gamma_1
-
-        else:
-            threat_gamma_1 = float(
-                st.number_input(
-                    label="Threat Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            control_gamma_1 = float(
-                st.number_input(
-                    label="Control Gamma",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            results_args["threat_gamma_1"] = threat_gamma_1
-            results_args["control_gamma_1"] = control_gamma_1
 
     # Model 2
     if two_model:
-        col1, col2, col3, col4, col5 = st.columns(spec=[1.5, 1, 1, 1, 1])
+        col1, col2, col3, col4 = st.columns(spec=4)
         with col1:
             st.write("Model 2")
             st.write("Loss Magnitude (£ million)")
@@ -747,93 +654,6 @@ if __name__ == "__main__":
                 )
                 results_args["threat_high_2"] = threat_high_2
                 results_args["control_high_2"] = control_high_2
-        with col5:
-            st.write("Confidence")
-            lm_gamma_2 = float(
-                st.number_input(
-                    label="LM Gamma 2",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=4.0,
-                )
-            )
-            results_args["lm_gamma_2"] = lm_gamma_2
-
-            if use_tef:
-                tef_gamma_2 = float(
-                    st.number_input(
-                        label="TEF Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                results_args["tef_gamma_2"] = tef_gamma_2
-
-            else:
-                contact_gamma_2 = float(
-                    st.number_input(
-                        label="Contact Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                action_gamma_2 = float(
-                    st.number_input(
-                        label="Action Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                results_args["contact_gamma_2"] = contact_gamma_2
-                results_args["action_gamma_2"] = action_gamma_2
-
-            if use_vuln:
-                vuln_gamma_2 = float(
-                    st.number_input(
-                        label="Vuln Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                results_args["vuln_gamma_2"] = vuln_gamma_2
-
-            else:
-                threat_gamma_2 = float(
-                    st.number_input(
-                        label="Threat Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                control_gamma_2 = float(
-                    st.number_input(
-                        label="Control Gamma 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=4.0,
-                    )
-                )
-                results_args["threat_gamma_2"] = threat_gamma_2
-                results_args["control_gamma_2"] = control_gamma_2
 
     submitted = st.button("Calculate")
 
