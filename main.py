@@ -9,6 +9,238 @@ from io import BytesIO
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
+def lm_display(model_number: int):
+    st.write("Loss Magnitude (£ million)")
+    results_args[f"lm_low_{model_number}"] = float(
+        Decimal(
+            st.number_input(
+                label=f"LM LOW {model_number}",
+                label_visibility="collapsed",
+                step=0.1,
+                min_value=0.0,
+                max_value=None,
+                value=0.1,
+                placeholder="Loss Magnatude - Low"
+            )
+        )
+        * Decimal(1000000.00)
+    )
+    results_args[f"lm_mode_{model_number}"] = float(
+        Decimal(
+            st.number_input(
+                label=f"LM MODE {model_number}",
+                label_visibility="collapsed",
+                step=0.1,
+                min_value=0.0,
+                max_value=None,
+                value=0.5,
+                placeholder="Loss Magnatude - Mode"
+            )
+        )
+        * Decimal(1000000.00)
+    )
+    results_args[f"lm_high_{model_number}"] = float(
+        Decimal(
+            st.number_input(
+                label=f"LM high {model_number}",
+                label_visibility="collapsed",
+                step=0.1,
+                min_value=0.0,
+                max_value=None,
+                value=1.0,
+                placeholder="Loss Magnatude - High"
+            )
+        )
+        * Decimal(1000000.00)
+    )
+
+
+def tef_display(model_number: int):
+    st.write("TEF (per year)")
+    results_args[f"tef_low_{model_number}"] = st.number_input(
+        label=f"TEF low {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=2,
+        placeholder="TEF - Low"
+    )
+    results_args[f"tef_mode_{model_number}"] = st.number_input(
+        label=f"TEF mode {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=5,
+        placeholder="TEF - Mode"
+    )
+    results_args[f"tef_high_{model_number}"] = st.number_input(
+        label=f"TEF HIGH {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=12,
+        placeholder="TEF - High"
+    )
+
+
+def contact_display(model_number: int):
+    st.write("Contact Frequency (per year)")
+    results_args[f"contact_low_{model_number}"] = st.number_input(
+        label=f"Contact low {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=2,
+        placeholder="Contact - Low"
+    )
+    results_args[f"contact_mode_{model_number}"] = st.number_input(
+        label=f"Contact mode {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=5,
+        placeholder="Contact - Mode"
+    )
+    results_args[f"contact_high_{model_number}"] = st.number_input(
+        label=f"Contact high {model_number}",
+        label_visibility="collapsed",
+        step=1,
+        min_value=0,
+        max_value=None,
+        value=20,
+        placeholder="Contact - High"
+    )
+
+
+def vuln_display(model_number):
+    st.write("Vulnerability (% per year)")
+    results_args[f"vuln_low_{model_number}"] = st.number_input(
+        label=f"VULN low {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.0,
+        max_value=1.0,
+        value=0.1,
+        placeholder="Vulnerability - Low"
+    )
+    results_args[f"vuln_mode_{model_number}"] = st.number_input(
+        label=f"VULN MODE {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.0,
+        max_value=1.0,
+        value=0.3,
+        placeholder="Vulnerability - Mode"
+    )
+    results_args[f"vuln_high_{model_number}"] = st.number_input(
+        label=f"VULN high {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.0,
+        max_value=1.0,
+        value=0.5,
+        placeholder="Vulnerability - High"
+    )
+
+
+def action_display(model_number):
+    st.write("Probability of Action (%)")
+    results_args[f"action_low_{model_number}"] = st.number_input(
+        label=f"Action low {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.1,
+        placeholder="Probability of Action - Low"
+    )
+    results_args[f"action_mode_{model_number}"] = st.number_input(
+        label=f"Action mode {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.15,
+        placeholder="Probability of Action - Mode"
+    )
+    results_args[f"action_high_{model_number}"] = st.number_input(
+        label=f"Action high {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.2,
+        placeholder="Probability of Action - High"
+    )
+
+
+def threat_display(model_number):
+    st.write("Threat Capacity (%)")
+    results_args[f"threat_low_{model_number}"] = st.number_input(
+        label=f"threat low {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.50,
+        placeholder="Threat Capacity - Low"
+    )
+    results_args[f"threat_mode_{model_number}"] = st.number_input(
+        label=f"threat mode {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.70,
+        placeholder="Threat Capacity - Mode"
+    )
+    results_args[f"threat_high_{model_number}"] = st.number_input(
+        label=f"threat high {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.90,
+        placeholder="Threat Capacity - High"
+    )
+
+
+def control_display(model_number):
+    st.write("Control Strength (%)")
+    results_args[f"control_low_{model_number}"] = st.number_input(
+        label=f"control low {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.70,
+        placeholder="Control Strength - Low"
+    )
+    results_args[f"control_mode_{model_number}"] = st.number_input(
+        label=f"control mode {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.80,
+        placeholder="Control Strength - Mode"
+    )
+    results_args[f"control_high_{model_number}"] = st.number_input(
+        label=f"control high {model_number}",
+        label_visibility="collapsed",
+        step=0.01,
+        min_value=0.00,
+        max_value=1.00,
+        value=0.90,
+        placeholder="Control Strength - High"
+    )
+
+
 def calculate_risk(simulations, use_tef, use_vuln, two_model, meta_model, **kwargs):
     """
     Calculates risk using PyFair models based on user input.
@@ -137,523 +369,50 @@ if __name__ == "__main__":
         "Number of Simulations", min_value=10000, max_value=100000, step=10000
     )
     results_args = {}
-    col1, col2, col3, col4 = st.columns(spec=4)
-    with col1:
-        st.write("Model 1")
-        st.write("Loss Magnitude (£ million)")
-        st.write("")
-        if use_tef:
-            st.write("TEF (per year)")
-            st.write("")
-        else:
-            st.write("Contact Frequency (per year)")
-            st.write("")
-            st.write("Probability of Action (%)")
-            st.write("")
-        if use_vuln:
-            st.write("Vulnerability (% per year)")
-            st.write("")
-        else:
-            st.write("Threat Capacity (%)")
-            st.write("")
-            st.write("Control (Resistance) Strength (%)")
-            st.write("")
-    with col2:
-        st.write("Low")
-        lm_low_1 = float(
-            Decimal(
-                st.number_input(
-                    label="LM LOW 1",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=None,
-                    value=0.1,
-                )
-            )
-            * Decimal(1000000.00)
-        )
-        results_args["lm_low_1"] = lm_low_1
+    columns = []
+    if not use_tef and not use_vuln:
+        col1, col2, col3, col4, col5, col6 = st.columns(spec=[0.5, 1, 1, 1, 1, 1])
+        columns = [col1, col2, col3, col4, col5, col6]
+    elif not use_tef or not use_vuln:
+        col1, col2, col3, col4, col5 = st.columns(spec=[0.5, 1, 1, 1, 1])
+        columns = [col1, col2, col3, col4, col5]
+    else:
+        col1, col2, col3, col4 = st.columns(spec=[0.5, 1, 1, 1])
+        columns = [col1, col2, col3, col4]
 
-        if use_tef:
-            tef_low_1 = st.number_input(
-                label="TEF LOW 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=0,
-            )
-            results_args["tef_low_1"] = tef_low_1
+    no_of_models = 1 if not two_model else 2
 
-        else:
-            contact_low_1 = st.number_input(
-                label="Contact LOW 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=2,
-            )
-            action_low_1 = st.number_input(
-                label="Action LOW 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.00,
-            )
-            results_args["contact_low_1"] = contact_low_1
-            results_args["action_low_1"] = action_low_1
-
-        if use_vuln:
-            vuln_low_1 = st.number_input(
-                label="VULN LOW 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.0,
-                max_value=1.0,
-                value=0.01,
-            )
-            results_args["vuln_low_1"] = vuln_low_1
-
-        else:
-            threat_low_1 = st.number_input(
-                label="threat LOW 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.50,
-            )
-            control_low_1 = st.number_input(
-                label="control LOW 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.75,
-            )
-            results_args["threat_low_1"] = threat_low_1
-            results_args["control_low_1"] = control_low_1
-
-    with col3:
-        st.write("Mode")
-        lm_mode_1 = float(
-            Decimal(
-                st.number_input(
-                    label="LM MODE 1",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=None,
-                    value=0.5,
-                )
-            )
-            * Decimal(1000000.00)
-        )
-        results_args["lm_mode_1"] = lm_mode_1
-
-        if use_tef:
-            tef_mode_1 = st.number_input(
-                label="TEF MODE 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=2,
-            )
-            results_args["tef_mode_1"] = tef_mode_1
-
-        else:
-            contact_mode_1 = st.number_input(
-                label="Contact mode 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=5,
-            )
-            action_mode_1 = st.number_input(
-                label="Action mode 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.15,
-            )
-            results_args["contact_mode_1"] = contact_mode_1
-            results_args["action_mode_1"] = action_mode_1
-
-        if use_vuln:
-            vuln_mode_1 = st.number_input(
-                label="VULN MODE 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.0,
-                max_value=1.0,
-                value=0.3,
-            )
-            results_args["vuln_mode_1"] = vuln_mode_1
-
-        else:
-            threat_mode_1 = st.number_input(
-                label="threat mode 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.70,
-            )
-            control_mode_1 = st.number_input(
-                label="control mode 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.80,
-            )
-            results_args["threat_mode_1"] = threat_mode_1
-            results_args["control_mode_1"] = control_mode_1
-
-    with col4:
-        st.write("High")
-        lm_high_1 = float(
-            Decimal(
-                st.number_input(
-                    label="LM HIGH 1",
-                    label_visibility="collapsed",
-                    step=0.1,
-                    min_value=0.0,
-                    max_value=None,
-                    value=1.0,
-                )
-            )
-            * Decimal(1000000.00)
-        )
-        results_args["lm_high_1"] = lm_high_1
-
-        if use_tef:
-            tef_high_1 = st.number_input(
-                label="TEF HIGH 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=12,
-            )
-            results_args["tef_high_1"] = tef_high_1
-
-        else:
-            contact_high_1 = st.number_input(
-                label="Contact high 1",
-                label_visibility="collapsed",
-                step=1,
-                min_value=0,
-                max_value=None,
-                value=20,
-            )
-            action_high_1 = st.number_input(
-                label="Action high 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.20,
-            )
-            results_args["contact_high_1"] = contact_high_1
-            results_args["action_high_1"] = action_high_1
-
-        if use_vuln:
-            vuln_high_1 = st.number_input(
-                label="VULN HIGH 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.0,
-                max_value=1.0,
-                value=0.5,
-            )
-            results_args["vuln_high_1"] = vuln_high_1
-
-        else:
-            threat_high_1 = st.number_input(
-                label="threat high 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.90,
-            )
-            control_high_1 = st.number_input(
-                label="control high 1",
-                label_visibility="collapsed",
-                step=0.01,
-                min_value=0.00,
-                max_value=1.00,
-                value=0.90,
-            )
-            results_args["threat_high_1"] = threat_high_1
-            results_args["control_high_1"] = control_high_1
-
-    # Model 2
-    if two_model:
-        col1, col2, col3, col4 = st.columns(spec=4)
+    for model in range(1, no_of_models + 1):
         with col1:
-            st.write("Model 2")
-            st.write("Loss Magnitude (£ million)")
-            st.write("")
-            if use_tef:
-                st.write("TEF (per year)")
-                st.write("")
-            else:
-                st.write("Contact Frequency (per year)")
-                st.write("")
-                st.write("Probability of Action (%)")
-                st.write("")
-            if use_vuln:
-                st.write("Vulnerability (% per year)")
-                st.write("")
-            else:
-                st.write("Threat Capacity (%)")
-                st.write("")
-                st.write("Control (Resistance) Strength (%)")
-                st.write("")
-        with col2:
+            st.write(f"Model {model}")
             st.write("Low")
-            lm_low_2 = float(
-                Decimal(
-                    st.number_input(
-                        label="LM LOW 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=None,
-                        value=0.1,
-                    )
-                )
-                * Decimal(1000000.00)
-            )
-            results_args["lm_low_2"] = lm_low_2
-
-            if use_tef:
-                tef_low_2 = st.number_input(
-                    label="TEF LOW 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=0,
-                )
-                results_args["tef_low_2"] = tef_low_2
-
-            else:
-                contact_low_2 = st.number_input(
-                    label="Contact low 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=2,
-                )
-                action_low_2 = st.number_input(
-                    label="Action low 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.00,
-                )
-                results_args["contact_low_2"] = contact_low_2
-                results_args["action_low_2"] = action_low_2
-
-            if use_vuln:
-                vuln_low_2 = st.number_input(
-                    label="VULN LOW 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.0,
-                    max_value=1.0,
-                    value=0.01,
-                )
-                results_args["vuln_low_2"] = vuln_low_2
-
-            else:
-                threat_low_2 = st.number_input(
-                    label="threat LOW 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.50,
-                )
-                control_low_2 = st.number_input(
-                    label="control LOW 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.75,
-                )
-                results_args["threat_low_2"] = threat_low_2
-                results_args["control_low_2"] = control_low_2
+            st.write("")
+            st.write("Mode")
+            st.write("")
+            st.write("High")
+            st.write("")
+        with col2:
+            lm_display(model)
 
         with col3:
-            st.write("Mode")
-            lm_mode_2 = float(
-                Decimal(
-                    st.number_input(
-                        label="LM MODE 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=None,
-                        value=0.5,
-                    )
-                )
-                * Decimal(1000000.00)
-            )
-            results_args["lm_mode_2"] = lm_mode_2
-
             if use_tef:
-                tef_mode_2 = st.number_input(
-                    label="TEF MODE 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=2,
-                )
-                results_args["tef_mode_2"] = tef_mode_2
+                tef_display(model)
 
-            else:
-                contact_mode_2 = st.number_input(
-                    label="Contact mode 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=5,
-                )
-                action_mode_2 = st.number_input(
-                    label="Action mode 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.15,
-                )
-                results_args["contact_mode_2"] = contact_mode_2
-                results_args["action_mode_2"] = action_mode_2
-
-            if use_vuln:
-                vuln_mode_2 = st.number_input(
-                    label="VULN MODE 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.0,
-                    max_value=1.0,
-                    value=0.3,
-                )
-                results_args["vuln_mode_2"] = vuln_mode_2
-
-            else:
-                threat_mode_2 = st.number_input(
-                    label="threat mode 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.70,
-                )
-                control_mode_2 = st.number_input(
-                    label="control mode 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.80,
-                )
-                results_args["threat_mode_2"] = threat_mode_2
-                results_args["control_mode_2"] = control_mode_2
+            elif not use_tef:
+                contact_display(model)
 
         with col4:
-            st.write("High")
-            lm_high_2 = float(
-                Decimal(
-                    st.number_input(
-                        label="LM HIGH 2",
-                        label_visibility="collapsed",
-                        step=0.1,
-                        min_value=0.0,
-                        max_value=None,
-                        value=1.0,
-                    )
-                )
-                * Decimal(1000000.00)
-            )
-            results_args["lm_high_2"] = lm_high_2
+            if not use_tef:
+                action_display(model)
 
-            if use_tef:
-                tef_high_2 = st.number_input(
-                    label="TEF HIGH 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=12,
-                )
-                results_args["tef_high_2"] = tef_high_2
-
-            else:
-                contact_high_2 = st.number_input(
-                    label="Contact high 2",
-                    label_visibility="collapsed",
-                    step=1,
-                    min_value=0,
-                    max_value=None,
-                    value=20,
-                )
-                action_high_2 = st.number_input(
-                    label="Action high 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.20,
-                )
-                results_args["contact_high_2"] = contact_high_2
-                results_args["action_high_2"] = action_high_2
-
-            if use_vuln:
-                vuln_high_2 = st.number_input(
-                    label="VULN HIGH 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.0,
-                    max_value=1.0,
-                    value=0.5,
-                )
-                results_args["vuln_high_2"] = vuln_high_2
-
-            else:
-                threat_high_2 = st.number_input(
-                    label="threat high 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.90,
-                )
-                control_high_2 = st.number_input(
-                    label="control high 2",
-                    label_visibility="collapsed",
-                    step=0.01,
-                    min_value=0.00,
-                    max_value=1.00,
-                    value=0.90,
-                )
-                results_args["threat_high_2"] = threat_high_2
-                results_args["control_high_2"] = control_high_2
+        if not use_vuln:
+            with columns[len(columns) - 2]:
+                threat_display(model)
+            with columns[len(columns) - 1]:
+                control_display(model)
+        else:
+            with columns[-1]:
+                vuln_display(model)
 
     submitted = st.button("Calculate")
 
